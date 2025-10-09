@@ -1,0 +1,8 @@
+{
+  "name": "Võ Phi Sơn",
+  "title": "Lập trình viên Web",
+  "email": "example@email.com",
+  "avatar": "/avatar.jpg",
+  "cv": "/CV.pdf",
+  "skills": ["Next.js", "React", "TypeScript", "Tailwind CSS"]
+}
