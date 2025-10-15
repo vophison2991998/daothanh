@@ -5,9 +5,18 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 
+
 export const metadata: Metadata = {
   title: "Trang thông tin cá nhân",
-  description: "Website cá nhân có đăng nhập cơ bản",
+  description: "Phường Đạo Thạnh",
+  icons: {
+    icon: "https://xacthuc.dichvucong.gov.vn/authenticationendpoint/images/quoc_huy.svg", // favicon nhỏ hiển thị trên tab trình duyệt
+  },
+  openGraph: {
+    title: "Phường Đạo Thạnh",
+    description: "Website cá nhân có đăng nhập cơ bản",
+    images: ["https://xacthuc.dichvucong.gov.vn/authenticationendpoint/images/quoc_huy.svg"], // ảnh hiện khi chia sẻ link
+  },
 };
 
 export default function RootLayout({

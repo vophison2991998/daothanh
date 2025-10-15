@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
+import { ROUTES } from "@/utils/routes";
 
 
 
@@ -71,6 +72,13 @@ const res = await fetch(url, { cache: "no-store" });
 
 const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
+  setError("");
+
+  const success = await login(username, password);
+
+  if (!success) {
+    setError("Sai tên đăng nhập hoặc mật khẩu!");
+  }
 
   try {
     const res = await fetch("/api/logincontext", {
@@ -88,7 +96,9 @@ const handleLogin = async (e: React.FormEvent) => {
 
     alert(data.message);
     localStorage.setItem("token", data.token);
-    router.push("/dashboard"); // ✅ chuyển đúng cách
+
+    router.push(ROUTES.HOME);
+// ✅ chuyển đúng cách
   } catch (err) {
     setError("Lỗi kết nối máy chủ!");
   }
