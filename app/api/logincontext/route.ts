@@ -1,9 +1,9 @@
+// app/api/logincontext/route.ts
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const { username, password } = await request.json();
+export async function POST(req: Request) {
+  const { username, password } = await req.json();
 
-  // Giả lập kiểm tra thông tin đăng nhập
   if (username === "admin" && password === "123456") {
     return NextResponse.json({
       success: true,
@@ -18,7 +18,6 @@ export async function POST(request: Request) {
   );
 }
 
-// Nếu có request GET để test
 export async function GET() {
   return NextResponse.json({ message: "API LoginContext hoạt động bình thường." });
 }

@@ -1,39 +1,29 @@
 "use client";
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-export default function Home() {
-  const { user, loading, logout } = useAuth(); // ✅ thêm logout vào đây
+export default function HomePage() {
+  const { user, logout, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [loading, user]);
+    if (!loading && !user) router.push("/login");
+  }, [user, loading, router]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Đang tải...</p>
-      </div>
-    );
-  }
-
+  if (loading) return <p className="text-center mt-10">Đang tải...</p>;
   if (!user) return null;
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold text-blue-600">Xin chào, {user} 👋</h1>
-      <p className="mt-2 text-gray-600">Bạn đã đăng nhập thành công.</p>
-
+    <div className="flex flex-col items-center justify-center min-h-screen bg-green-50">
+      <h1 className="text-3xl font-bold text-green-700">Xin chào, {user} 👋</h1>
       <button
         onClick={logout}
-        className="mt-6 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        className="mt-6 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
       >
-        🚪 Đăng xuất
+        Đăng xuất
       </button>
-    </main>
+    </div>
   );
 }

@@ -17,24 +17,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // ✅ Kiểm tra trạng thái đăng nhập khi mở app
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const expiresAt = localStorage.getItem("expiresAt");
-
-    if (storedUser && expiresAt) {
-      const now = Date.now();
-      if (now < parseInt(expiresAt)) {
-        setUser(storedUser);
-      } else {
-        localStorage.removeItem("user");
-        localStorage.removeItem("expiresAt");
-      }
+    if (storedUser && expiresAt && Date.now() < Number(expiresAt)) {
+      setUser(storedUser);
     }
-
-    // ✅ Đánh dấu đã tải xong trạng thái
     setLoading(false);
   }, []);
 
+  // ✅ Hàm đăng nhập
   const login = async (username: string, password: string): Promise<boolean> => {
     if (username === "admin" && password === "123456") {
       const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 ngày
@@ -46,6 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return false;
   };
 
+  // ✅ Đăng xuất
   const logout = () => {
     localStorage.clear();
     setUser(null);
@@ -59,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// ✅ Hook tiện dùng
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
