@@ -146,7 +146,7 @@ export default function LoginPage() {
             <h4 className="text-gray-800 font-semibold text-lg">Đăng nhập</h4>
             <h5 className="text-primary text-blue-600 mt-2 text-sm">
               Chọn loại tài khoản bạn muốn sử dụng đăng nhập<br />
-              Cổng dịch vụ công Quốc Gia
+              
             </h5>
           </div>
 
@@ -192,9 +192,7 @@ export default function LoginPage() {
                   Thông báo từ hệ thống:
                 </em>
                 <p className="mt-2">
-                  Khi đăng nhập, thông tin cá nhân (họ tên, ngày sinh, giới
-                  tính, số điện thoại,...) được đồng bộ từ VNeID sang Cổng DVC
-                  Quốc gia.
+                  ĐÂY LÀ WEBSITE CỦA PHƯỜNG ĐẠO THẠNH 
                 </p>
               </div>
             </>
@@ -236,10 +234,10 @@ export default function LoginPage() {
         {!isMobile && (
           <footer className="mt-6 bg-[#913938] text-white rounded p-3 text-center">
             <div className="flex flex-col sm:flex-row sm:justify-center sm:gap-6 gap-2">
-              <div className="text-sm">Cơ quan chủ quản: Văn phòng Chính phủ</div>
-              <div className="text-sm">www.dichvucong.gov.vn</div>
-              <div className="text-sm">Tổng đài hỗ trợ: 18001096</div>
-              <div className="text-sm">Email: dichvucong@chinhphu.vn</div>
+              <div className="text-sm">Cơ quan chủ quản: VĂN PHÒNG ỦY BAN NHÂN DÂN PHƯỜNG ĐẠO THẠNH</div>
+              <div className="text-sm">www.phuongdaothanh.com </div>
+              <div className="text-sm">Tổng đài hỗ trợ: 0335627466</div>
+              <div className="text-sm">Email: vophison2991998@gmail.com</div>
             </div>
           </footer>
         )}
