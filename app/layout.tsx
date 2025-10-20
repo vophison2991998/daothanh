@@ -4,6 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Providers } from "@/components/Providers"; // ✅ import file client riêng
 import { AuthProvider } from "@/context/AuthContext";
+import NotificationCenter from "@/components/NotificationCenter";
 
 export const metadata: Metadata = {
   title: "Trang thông tin cá nhân",
