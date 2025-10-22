@@ -18,8 +18,8 @@ import NotificationCenter from "@/components/NotificationCenter";
 
     const [data, setData] = useState([
       [
-        { id: 1, name: "Hồ sơ cá nhân", path: "/table/personal/item1" },
-        { id: 2, name: "Tạo tài khoản", path: "/table/personal/item2" },
+        { id: 1, name: "Hồ sơ cá nhân", path: "/table/personal/admin" },
+        { id: 2, name: "Tạo tài khoản", path: "/table/personal/createuser" },
       ],
       [
         { id: 1, name: "Thống kê nước uống", path: "/table/statistics/item1" },
@@ -104,7 +104,8 @@ import NotificationCenter from "@/components/NotificationCenter";
         <Toaster position="top-right" />
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-green-700 text-center mb-8">
-            Xin chào,       {user} 👋
+            <p>{user?.username}</p>
+
           </h1>
 
           <div className="flex justify-between items-center mb-10">

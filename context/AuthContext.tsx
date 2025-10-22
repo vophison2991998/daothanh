@@ -1,61 +1,68 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
-  user: string | null;
-  loading: boolean;
+  user: any;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null);
 
-  // ✅ Kiểm tra trạng thái đăng nhập khi mở app
+  // 🔹 Khi F5, nếu đã đăng nhập thì lấy user từ localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const expiresAt = localStorage.getItem("expiresAt");
-    if (storedUser && expiresAt && Date.now() < Number(expiresAt)) {
-      setUser(storedUser);
+    const savedUser = localStorage.getItem("user");
+    if (savedUser && savedUser !== "undefined") {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
     }
-    setLoading(false);
   }, []);
 
-  // ✅ Hàm đăng nhập
-  const login = async (username: string, password: string): Promise<boolean> => {
-    if (username === "admin" && password === "123456") {
-      const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 ngày
-      localStorage.setItem("user", username);
-      localStorage.setItem("expiresAt", expiresAt.toString());
-      setUser(username);
-      return true;
-    }
-    return false;
-  };
+  // 🔹 Hàm đăng nhập
+const login = async (username: string, password: string) => {
+  try {
+    const res = await fetch("http://localhost:5000/admins/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-  // ✅ Đăng xuất
+    if (!res.ok) throw new Error("Đăng nhập thất bại");
+    const data = await res.json();
+
+    // ✅ Chỉ lưu thông tin user, không render object ra giao diện
+    setUser(data.admin || data);
+
+    return true;
+  } catch (err) {
+    alert("Sai tài khoản hoặc mật khẩu");
+    return false;
+  }
+};
+
+
+  // 🔹 Đăng xuất
   const logout = () => {
-    localStorage.clear();
     setUser(null);
-    router.push("/login");
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-// ✅ Hook tiện dùng
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
-};
+}
