@@ -1,27 +1,33 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function middleware(req) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const loginUrl = "http://localhost:3000/login";
 
-  // Cho phép các đường dẫn công khai
-  if (pathname.startsWith("/login") || pathname.startsWith("/api")) {
+  // ⚙️ Cho phép vào /login và các file tĩnh
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/static") ||
+    pathname === "/favicon.ico"
+  ) {
     return NextResponse.next();
   }
 
-  // Nếu chưa có token (chưa đăng nhập) → về /login
-  if (!token) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+  // 🔒 Kiểm tra cookie user
+  const userCookie = req.cookies.get("user");
+
+  if (!userCookie) {
+    // Chưa đăng nhập → ép chuyển hướng về login
+    return NextResponse.redirect(loginUrl);
   }
 
-  // Nếu có token → cho đi tiếp
+  // ✅ Đã đăng nhập → cho phép vào trang
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/profile/:path*"],
+  matcher: ["/((?!api|_next|static|favicon.ico).*)"],
 };

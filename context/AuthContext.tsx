@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
   user: any;
+  loading: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -12,55 +13,87 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // 🔹 Khi F5, nếu đã đăng nhập thì lấy user từ localStorage
+  // ✅ Khi app load lại, đọc user từ localStorage
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser && savedUser !== "undefined") {
-      try {
+    try {
+      const savedUser = localStorage.getItem("user");
+      if (savedUser && savedUser !== "undefined") {
         setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem("user");
       }
+    } catch (error) {
+      console.error("❌ Lỗi khi parse user từ localStorage:", error);
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  // 🔹 Hàm đăng nhập
-const login = async (username: string, password: string) => {
+  // ✅ Hàm login
+const login = async (username: string, password: string): Promise<boolean> => {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+
     const res = await fetch("http://localhost:5000/admins/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
+      signal: controller.signal,
     });
 
-    if (!res.ok) throw new Error("Đăng nhập thất bại");
-    const data = await res.json();
+    clearTimeout(timeout);
 
-    // ✅ Chỉ lưu thông tin user, không render object ra giao diện
-    setUser(data.admin || data);
+    if (!res.ok) {
+      console.warn("⚠️ Đăng nhập thất bại, mã:", res.status);
+      return false;
+    }
+
+    const data = await res.json();
+    const baseUser = data.admin || data;
+
+    const detailRes = await fetch(`http://localhost:5000/admins/${baseUser.admin_id || baseUser.id}`);
+    if (!detailRes.ok) {
+      console.warn("⚠️ Không thể lấy thông tin chi tiết admin");
+      return false;
+    }
+
+    const detailData = await detailRes.json();
+    const userData = { ...baseUser, ...detailData };
+
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+    document.cookie = `user=${encodeURIComponent(JSON.stringify(userData))}; path=/;`;
 
     return true;
-  } catch (err) {
-    alert("Sai tài khoản hoặc mật khẩu");
+  } catch (error: any) {
+    if (error.name === "AbortError") {
+      console.error("❌ Request login timeout");
+    } else {
+      console.error("❌ Lỗi khi đăng nhập:", error);
+    }
     return false;
   }
 };
 
 
-  // 🔹 Đăng xuất
+  // ✅ Hàm logout
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    document.cookie =
+      "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// ✅ Hook truy cập AuthContext
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
